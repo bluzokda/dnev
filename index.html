@@ -346,9 +346,10 @@
             </div>
             
             <div class="content">
+                <!-- Главная -->
                 <div class="tab active" id="main">
                     <div class="form-group">
-                        <label for="subject">Предмет / Деятельность</label>
+                        <label for="subject">Предмет</label>
                         <select id="subject">
                             <option value="">Выберите предмет</option>
                             <option value="Алгебра">Алгебра</option>
@@ -374,11 +375,11 @@
                         <label for="grade">Оценка (1–5)</label>
                         <select id="grade">
                             <option value="">Выберите</option>
-                            <option value="5">5 — Отлично!</option>
-                            <option value="4">4 — Хорошо</option>
-                            <option value="3">3 — Средне</option>
-                            <option value="2">2 — Плохо</option>
-                            <option value="1">1 — Очень плохо</option>
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
                         </select>
                     </div>
                     
@@ -396,12 +397,12 @@
                     
                     <div class="form-group">
                         <label for="comment">Комментарий</label>
-                        <textarea id="comment" placeholder="Что было интересного?"></textarea>
+                        <textarea id="comment" placeholder="Что было сегодня?"></textarea>
                     </div>
 
                     <div class="actions">
                         <button class="btn btn-primary" id="save-btn">
-                            <i class="fas fa-plus"></i> Добавить
+                            <i class="fas fa-save"></i> Добавить
                         </button>
                         <button class="btn btn-warning" id="load-btn">
                             <i class="fas fa-sync"></i> Загрузить
@@ -436,12 +437,13 @@
                     </div>
                 </div>
 
+                <!-- Архив -->
                 <div class="tab" id="archive">
                     <h3>Архив записей</h3>
                     <div class="archive-controls">
                         <div class="subjects-list" id="subjects-list"></div>
                         <div style="flex: 1;">
-                            <input type="text" class="search-input" id="search-subject" placeholder="Поиск...">
+                            <input type="text" class="search-input" id="search-subject" placeholder="Поиск по предмету...">
                         </div>
                     </div>
                     <table class="archive-table">
@@ -479,14 +481,14 @@
                 });
             });
 
-            // Загрузка
+            // Инициализация
             loadDataForDate(today);
             updateStats();
 
             dateInput.addEventListener('change', () => loadDataForDate(dateInput.value));
             document.getElementById('load-btn').addEventListener('click', () => loadDataForDate(dateInput.value));
 
-            // Добавление
+            // Добавление записи
             document.getElementById('save-btn').addEventListener('click', function() {
                 const date = dateInput.value;
                 const subject = document.getElementById('subject').value;
@@ -496,10 +498,10 @@
                 }
 
                 const data = {
-                    subject,
+                    subject: subject,
                     grade: document.getElementById('grade').value || '—',
                     absence: document.getElementById('absence').value || '',
-                    comment: document.getElementById('comment').value || '—',
+                    comment: document.getElementById('comment').value || '—'
                 };
 
                 const entries = JSON.parse(localStorage.getItem(`diary_${date}`)) || [];
@@ -525,13 +527,14 @@
                 const display = document.getElementById('record-display');
                 if (entries.length > 0) {
                     const last = entries[entries.length - 1];
-                    Object.entries(last).forEach(([key, val]) => {
-                        const el = document.getElementById(key);
-                        if (el) el.value = val;
-                    });
+                    document.getElementById('subject').value = last.subject;
+                    document.getElementById('grade').value = last.grade;
+                    document.getElementById('absence').value = last.absence;
+                    document.getElementById('comment').value = last.comment;
+
                     document.getElementById('display-date').textContent = formatDate(date);
                     document.getElementById('display-subject').textContent = last.subject;
-                    document.getElementById('display-grade').textContent = getGradeText(last.grade);
+                    document.getElementById('display-grade').textContent = last.grade;
                     document.getElementById('display-absence').textContent = getAbsenceText(last.absence);
                     document.getElementById('display-comment').textContent = last.comment;
                     display.style.display = 'block';
@@ -551,10 +554,6 @@
 
             function formatDate(dateStr) {
                 return new Date(dateStr).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
-            }
-
-            function getGradeText(grade) {
-                return { '5': '5 — Отлично!', '4': '4 — Хорошо', '3': '3 — Средне', '2': '2 — Плохо', '1': '1 — Очень плохо' }[grade] || '—';
             }
 
             function getAbsenceText(value) {
@@ -580,7 +579,7 @@
                 document.getElementById('avg-grade').textContent = count ? (grades / count).toFixed(1) : '—';
             }
 
-            // === Архив ===
+            // Загрузка архива
             function loadArchive() {
                 const tbody = document.getElementById('archive-body');
                 const subjectsList = document.getElementById('subjects-list');
@@ -604,18 +603,29 @@
 
                 allData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                allData.forEach((data, index) => {
+                allData.forEach(data => {
                     const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td>${formatDate(data.date)}</td>
-                        <td>${data.subject}</td>
-                        <td>${getGradeText(data.grade)}</td>
-                        <td>${getAbsenceText(data.absence)}</td>
-                        <td>${data.comment}</td>
-                        <td>
-                            <button class="delete-btn" onclick="deleteByIndex('${data.date}', ${allData.indexOf(data)})">Удалить</button>
-                        </td>
-                    `;
+                    const cellDate = row.insertCell();
+                    cellDate.textContent = formatDate(data.date);
+
+                    const cellSubject = row.insertCell();
+                    cellSubject.textContent = data.subject;
+
+                    const cellGrade = row.insertCell();
+                    cellGrade.textContent = data.grade;
+
+                    const cellAbsence = row.insertCell();
+                    cellAbsence.textContent = getAbsenceText(data.absence);
+
+                    const cellComment = row.insertCell();
+                    cellComment.textContent = data.comment;
+
+                    const cellActions = row.insertCell();
+                    const btn = document.createElement('button');
+                    btn.className = 'delete-btn';
+                    btn.textContent = 'Удалить';
+                    btn.onclick = () => deleteEntry(data.date, data.subject, data.grade, data.absence, data.comment);
+                    cellActions.appendChild(btn);
                 });
 
                 Object.entries(subjectsMap).sort((a, b) => b[1] - a[1]).forEach(([sub, cnt]) => {
@@ -642,17 +652,17 @@
                     if (key.startsWith('diary_')) {
                         const date = key.split('_')[1];
                         const entries = JSON.parse(localStorage.getItem(key)) || [];
-                        entries.forEach((entry, idx) => {
+                        entries.forEach(entry => {
                             if (entry.subject === subject) {
                                 const row = tbody.insertRow();
                                 row.innerHTML = `
                                     <td>${formatDate(date)}</td>
                                     <td>${entry.subject}</td>
-                                    <td>${getGradeText(entry.grade)}</td>
+                                    <td>${entry.grade}</td>
                                     <td>${getAbsenceText(entry.absence)}</td>
                                     <td>${entry.comment}</td>
                                     <td>
-                                        <button class="delete-btn" onclick="deleteByIndex('${date}', ${idx})">Удалить</button>
+                                        <button class="delete-btn" onclick="deleteEntry('${date}', '${entry.subject}', '${entry.grade}', '${entry.absence}', '${entry.comment}')">Удалить</button>
                                     </td>
                                 `;
                             }
@@ -661,16 +671,20 @@
                 }
             };
 
-            window.deleteByIndex = function(date, index) {
+            window.deleteEntry = function(date, subject, grade, absence, comment) {
+                if (!confirm('Удалить эту запись?')) return;
                 const key = `diary_${date}`;
                 const entries = JSON.parse(localStorage.getItem(key)) || [];
-                if (index >= 0 && index < entries.length) {
-                    entries.splice(index, 1);
-                    localStorage.setItem(key, JSON.stringify(entries));
-                    loadArchive();
-                    updateStats();
-                    loadDataForDate(document.getElementById('date-selector').value);
-                }
+                const filtered = entries.filter(e => 
+                    !(e.subject === subject && 
+                      e.grade === grade && 
+                      e.absence === absence && 
+                      e.comment === comment)
+                );
+                localStorage.setItem(key, JSON.stringify(filtered));
+                loadArchive();
+                updateStats();
+                loadDataForDate(document.getElementById('date-selector').value);
             };
         });
     </script>
