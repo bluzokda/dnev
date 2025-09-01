@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный дневник оценок</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #3a4f76;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 2rem;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+        }
+        
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 30px;
+            color: #333;
+        }
+        
+        .date-selector input {
+            border: none;
+            font-size: 1rem;
+            color: #3a4f76;
+            font-weight: 500;
+        }
+        
+        .main-content {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #f0f4f8;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        
+        .sidebar h3 {
+            color: #3a4f76;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3a4f76;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: #3a4f76;
+            color: white;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .subject-info {
+            background: #e8f0fe;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .subject-info input, .subject-info textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .subject-info textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .grades-table th, .grades-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .grades-table th {
+            background-color: #3a4f76;
+            color: white;
+        }
+        
+        .grades-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .grades-table tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .grade-cell {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .attendance-cell {
+            width: 120px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+        }
+        
+        .btn-secondary {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #d32f2f;
+        }
+        
+        .add-form {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr 120px 120px 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .add-form input, .add-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .form-title {
+            margin-bottom: 15px;
+            color: #3a4f76;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3a4f76;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: #e8f0fe;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #3a4f76;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3a4f76;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .add-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-book"></i>
+                <h1>Личный дневник оценок</h1>
+            </div>
+            <div class="date-selector">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" id="date-selector">
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Меню</h3>
+                <div class="nav-item active">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Учебный процесс</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Статистика</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Настройки</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Помощь</span>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="subject-info">
+                    <input type="text" id="subject" placeholder="Предмет">
+                    <input type="text" id="lesson-theme" placeholder="Тема урока">
+                    <textarea id="lesson-info" placeholder="Дополнительная информация об уроке"></textarea>
+                </div>
+                
+                <h3 class="form-title">Добавить запись:</h3>
+                <div class="add-form">
+                    <input type="text" id="student-name" placeholder="ФИО учащегося">
+                    <select id="grade">
+                        <option value="">Оценка</option>
+                        <option value="5">5</option>
+                        <option value="4">4</option>
+                        <option value="3">3</option>
+                        <option value="2">2</option>
+                        <option value="1">1</option>
+                    </select>
+                    <select id="attendance">
+                        <option value="">Посещаемость</option>
+                        <option value="present">Присутствовал</option>
+                        <option value="absent">Отсутствовал</option>
+                        <option value="ill">Болел</option>
+                        <option value="late">Опоздал</option>
+                    </select>
+                    <input type="text" id="comment" placeholder="Комментарий">
+                    <button class="btn btn-primary" id="add-record">
+                        <i class="fas fa-plus"></i> Добавить
+                    </button>
+                </div>
+                
+                <table class="grades-table">
+                    <thead>
+                        <tr>
+                            <th width="50">№</th>
+                            <th>ФИО</th>
+                            <th width="100">Оценка</th>
+                            <th width="140">Посещаемость</th>
+                            <th>Комментарий</th>
+                            <th width="100">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-table">
+                        <!-- Записи будут добавляться здесь -->
+                    </tbody>
+                </table>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Средний балл</h3>
+                        <div class="stat-value" id="average-grade">0.0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Всего записей</h3>
+                        <div class="stat-value" id="total-records">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Пропусков</h3>
+                        <div class="stat-value" id="total-absences">0</div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-primary" id="save-btn">
+                        <i class="fas fa-save"></i> Сохранить
+                    </button>
+                    <button class="btn btn-secondary" id="reset-btn">
+                        <i class="fas fa-trash"></i> Очистить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Установка текущей даты по умолчанию
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date-selector').value = today;
+            
+            // Загрузка данных для выбранной даты
+            loadDataForDate(today);
+            
+            // Обработчик изменения даты
+            document.getElementById('date-selector').addEventListener('change', function() {
+                loadDataForDate(this.value);
+            });
+            
+            // Обработчик добавления записи
+            document.getElementById('add-record').addEventListener('click', function() {
+                addRecord();
+            });
+            
+            // Обработчик сохранения
+            document.getElementById('save-btn').addEventListener('click', function() {
+                saveData();
+                alert('Данные успешно сохранены!');
+            });
+            
+            // Обработчик очистки
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите очистить все данные для этой даты?')) {
+                    clearDataForDate(document.getElementById('date-selector').value);
+                }
+            });
+            
+            // Функция загрузки данных для выбранной даты
+            function loadDataForDate(date) {
+                const data = JSON.parse(localStorage.getItem(`diary_${date}`)) || {
+                    subject: '',
+                    theme: '',
+                    info: '',
+                    records: []
+                };
+                
+                document.getElementById('subject').value = data.subject || '';
+                document.getElementById('lesson-theme').value = data.theme || '';
+                document.getElementById('lesson-info').value = data.info || '';
+                
+                updateRecordsTable(data.records);
+                updateStatistics(data.records);
+            }
+            
+            // Функция сохранения данных
+            function saveData() {
+                const date = document.getElementById('date-selector').value;
+                const data = {
+                    subject: document.getElementById('subject').value,
+                    theme: document.getElementById('lesson-theme').value,
+                    info: document.getElementById('lesson-info').value,
+                    records: getRecordsFromTable()
+                };
+                
+                localStorage.setItem(`diary_${date}`, JSON.stringify(data));
+            }
+            
+            // Функция добавления записи
+            function addRecord() {
+                const name = document.getElementById('student-name').value;
+                const grade = document.getElementById('grade').value;
+                const attendance = document.getElementById('attendance').value;
+                const comment = document.getElementById('comment').value;
+                
+                if (!name) {
+                    alert('Пожалуйста, введите ФИО учащегося');
+                    return;
+                }
+                
+                const records = getRecordsFromTable();
+                records.push({
+                    name,
+                    grade,
+                    attendance,
+                    comment
+                });
+                
+                updateRecordsTable(records);
+                updateStatistics(records);
+                
+                // Очистка полей ввода
+                document.getElementById('student-name').value = '';
+                document.getElementById('grade').value = '';
+                document.getElementById('attendance').value = '';
+                document.getElementById('comment').value = '';
+            }
+            
+            // Функция получения записей из таблицы
+            function getRecordsFromTable() {
+                const records = [];
+                const rows = document.querySelectorAll('#records-table tr');
+                
+                rows.forEach(row => {
+                    records.push({
+                        name: row.cells[1].textContent,
+                        grade: row.cells[2].textContent,
+                        attendance: row.cells[3].textContent,
+                        comment: row.cells[4].textContent
+                    });
+                });
+                
+                return records;
+            }
+            
+            // Функция обновления таблицы записей
+            function updateRecordsTable(records) {
+                const table = document.getElementById('records-table');
+                table.innerHTML = '';
+                
+                records.forEach((record, index) => {
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${record.name}</td>
+                        <td class="grade-cell">${record.grade}</td>
+                        <td class="attendance-cell">${getAttendanceText(record.attendance)}</td>
+                        <td>${record.comment}</td>
+                        <td>
+                            <button onclick="editRecord(this)" class="btn-small"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteRecord(this)" class="btn-small"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                });
+            }
+            
+            // Функция обновления статистики
+            function updateStatistics(records) {
+                document.getElementById('total-records').textContent = records.length;
+                
+                // Расчет среднего балла
+                const grades = records
+                    .filter(r => r.grade && !isNaN(r.grade))
+                    .map(r => parseInt(r.grade));
+                
+                const average = grades.length > 0 ? 
+                    (grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(1) : '0.0';
+                
+                document.getElementById('average-grade').textContent = average;
+                
+                // Подсчет пропусков
+                const absences = records.filter(r => 
+                    r.attendance === 'absent' || r.attendance === 'ill').length;
+                
+                document.getElementById('total-absences').textContent = absences;
+            }
+            
+            // Функция получения текста посещаемости
+            function getAttendanceText(attendance) {
+                const texts = {
+                    'present': 'Присутствовал',
+                    'absent': 'Отсутствовал',
+                    'ill': 'Болел',
+                    'late': 'Опоздал'
+                };
+                
+                return texts[attendance] || '';
+            }
+            
+            // Функция очистки данных для выбранной даты
+            function clearDataForDate(date) {
+                localStorage.removeItem(`diary_${date}`);
+                loadDataForDate(date);
+            }
+            
+            // Глобальные функции для кнопок действий
+            window.editRecord = function(button) {
+                const row = button.closest('tr');
+                const name = row.cells[1].textContent;
+                const grade = row.cells[2].textContent;
+                const attendance = row.cells[3].textContent;
+                const comment = row.cells[4].textContent;
+                
+                document.getElementById('student-name').value = name;
+                document.getElementById('grade').value = grade;
+                document.getElementById('comment').value = comment;
+                
+                // Определяем значение посещаемости по тексту
+                const attendanceSelect = document.getElementById('attendance');
+                for (let i = 0; i < attendanceSelect.options.length; i++) {
+                    if (getAttendanceText(attendanceSelect.options[i].value) === attendance) {
+                        attendanceSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                row.remove();
+                saveData();
+                loadDataForDate(document.getElementById('date-selector').value);
+            };
+            
+            window.deleteRecord = function(button) {
+                if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+                    button.closest('tr').remove();
+                    saveData();
+                    loadDataForDate(document.getElementById('date-selector').value);
+                }
+            };
+        });
+    </script>
+</body>
+</html>
