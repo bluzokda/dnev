@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Моя Памятка - Улучшенный архив</title>
+    <title>Мой Дневник - Все записи сохраняются</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -137,7 +137,8 @@
         }
         
         .form-group select,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group input {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -410,7 +411,7 @@
         <header>
             <div class="logo">
                 <i class="fas fa-book"></i>
-                <h1>Моя Памятка</h1>
+                <h1>Мой Дневник</h1>
             </div>
             <div class="date-selector">
                 <i class="fas fa-calendar-alt"></i>
@@ -455,7 +456,7 @@
                             <option value="ВиС">ВиС</option>
                             <option value="Физика">Физика</option>
                             <option value="Химия">Химия</option>
-                            <option value="Биология">Биология</особия>
+                            <option value="Биология">Биология</option>
                             <option value="ФЗК">ФЗК</option>
                             <option value="ИП">ИП</option>
                         </select>
@@ -502,22 +503,13 @@
                         </button>
                     </div>
 
-                    <div class="record-display" id="record-display" style="display: none;">
-                        <h3>Сохранённая запись:</h3>
-                        <p><strong>Дата:</strong> <span id="display-date"></span></p>
-                        <p><strong>Предмет:</strong> <span id="display-subject"></span></p>
-                        <p><strong>Оценка:</strong> <span id="display-grade"></span></p>
-                        <p><strong>Пропуск:</strong> <span id="display-absence"></span></p>
-                        <p><strong>Комментарий:</strong> <span id="display-comment"></span></p>
-                    </div>
-
                     <div class="stats">
                         <div class="stat-card">
                             <h3>Ср. оценка</h3>
                             <div class="stat-value" id="avg-grade">-</div>
                         </div>
                         <div class="stat-card">
-                            <h3>Всего дней</h3>
+                            <h3>Всего записей</h3>
                             <div class="stat-value" id="total-days">0</div>
                         </div>
                         <div class="stat-card">
@@ -577,14 +569,13 @@
                                 </div>
                                 
                                 <div class="filter-group">
-                                    <label>Пропуск</label>
-                                    <select class="filter-select" id="filter-absence">
-                                        <option value="">Все</option>
-                                        <option value="ill">Болел</option>
-                                        <option value="lazy">Не хотел</option>
-                                        <option value="busy">Был занят</option>
-                                        <option value="vacation">Отпуск</option>
-                                        <option value="other">Другое</option>
+                                    <label>Период</label>
+                                    <select class="filter-select" id="filter-period">
+                                        <option value="">Все даты</option>
+                                        <option value="week">За неделю</option>
+                                        <option value="month">За месяц</option>
+                                        <option value="quarter">За квартал</option>
+                                        <option value="year">За год</option>
                                     </select>
                                 </div>
                                 
@@ -694,21 +685,15 @@
             });
 
             // Загрузка данных при старте
-            loadDataForDate(today);
             updateStats();
 
             // Обработчики событий
             dateInput.addEventListener('change', function() {
-                loadDataForDate(this.value);
-            });
-
-            document.getElementById('load-btn').addEventListener('click', function() {
-                loadDataForDate(dateInput.value);
+                // Для текущей реализации не требуется
             });
 
             document.getElementById('save-btn').addEventListener('click', function() {
-                saveData(dateInput.value);
-                loadDataForDate(dateInput.value);
+                saveRecord();
                 updateStats();
                 alert('✅ Запись сохранена!');
             });
@@ -729,7 +714,7 @@
                 document.getElementById('archive-search').value = '';
                 document.getElementById('filter-subject').value = '';
                 document.getElementById('filter-grade').value = '';
-                document.getElementById('filter-absence').value = '';
+                document.getElementById('filter-period').value = '';
                 document.getElementById('sort-by').value = 'date-desc';
                 currentPage = 1;
                 loadArchive();
@@ -745,7 +730,7 @@
                 loadArchive();
             });
             
-            document.getElementById('filter-absence').addEventListener('change', function() {
+            document.getElementById('filter-period').addEventListener('change', function() {
                 currentPage = 1;
                 loadArchive();
             });
@@ -773,38 +758,41 @@
             });
 
             // === Функции ===
-            function saveData(date) {
-                const data = {
-                    date: date,
-                    subject: document.getElementById('subject').value || '—',
-                    grade: document.getElementById('grade').value || '—',
-                    absence: document.getElementById('absence').value || '',
-                    comment: document.getElementById('comment').value || '—',
-                };
-                localStorage.setItem(`diary_${date}`, JSON.stringify(data));
-            }
-
-            function loadDataForDate(date) {
-                const data = JSON.parse(localStorage.getItem(`diary_${date}`));
-                const display = document.getElementById('record-display');
-
-                if (data) {
-                    document.getElementById('subject').value = data.subject;
-                    document.getElementById('grade').value = data.grade;
-                    document.getElementById('absence').value = data.absence || '';
-                    document.getElementById('comment').value = data.comment;
-
-                    document.getElementById('display-date').textContent = formatDate(date);
-                    document.getElementById('display-subject').textContent = data.subject;
-                    document.getElementById('display-grade').textContent = getGradeText(data.grade);
-                    document.getElementById('display-absence').textContent = getAbsenceText(data.absence);
-                    document.getElementById('display-comment').textContent = data.comment;
-
-                    display.style.display = 'block';
-                } else {
-                    clearForm();
-                    display.style.display = 'none';
+            function saveRecord() {
+                const subject = document.getElementById('subject').value;
+                const grade = document.getElementById('grade').value;
+                const absence = document.getElementById('absence').value;
+                const comment = document.getElementById('comment').value;
+                const date = document.getElementById('date-selector').value;
+                
+                if (!subject) {
+                    alert('Пожалуйста, выберите предмет');
+                    return;
                 }
+                
+                // Создаем уникальный ID для записи
+                const id = Date.now().toString();
+                
+                const record = {
+                    id: id,
+                    date: date,
+                    subject: subject,
+                    grade: grade,
+                    absence: absence,
+                    comment: comment
+                };
+                
+                // Получаем существующие записи
+                let records = JSON.parse(localStorage.getItem('diary_records')) || [];
+                
+                // Добавляем новую запись
+                records.push(record);
+                
+                // Сохраняем обратно в localStorage
+                localStorage.setItem('diary_records', JSON.stringify(records));
+                
+                // Очищаем форму
+                clearForm();
             }
 
             function clearForm() {
@@ -812,7 +800,6 @@
                 document.getElementById('grade').value = '';
                 document.getElementById('absence').value = '';
                 document.getElementById('comment').value = '';
-                document.getElementById('record-display').style.display = 'none';
             }
 
             function formatDate(dateStr) {
@@ -844,23 +831,20 @@
             }
 
             function updateStats() {
-                let totalDays = 0;
+                const records = JSON.parse(localStorage.getItem('diary_records')) || [];
+                
+                let totalDays = records.length;
                 let totalAbsences = 0;
                 let totalGrades = 0;
                 let gradeCount = 0;
 
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('diary_')) {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        totalDays++;
-                        if (data.absence) totalAbsences++;
-                        if (data.grade && !isNaN(data.grade)) {
-                            totalGrades += parseInt(data.grade);
-                            gradeCount++;
-                        }
+                records.forEach(record => {
+                    if (record.absence) totalAbsences++;
+                    if (record.grade && !isNaN(record.grade)) {
+                        totalGrades += parseInt(record.grade);
+                        gradeCount++;
                     }
-                }
+                });
 
                 document.getElementById('total-days').textContent = totalDays;
                 document.getElementById('total-absences').textContent = totalAbsences;
@@ -868,39 +852,35 @@
             }
             
             function loadStats() {
-                let totalDays = 0;
+                const records = JSON.parse(localStorage.getItem('diary_records')) || [];
+                
+                let totalDays = records.length;
                 let totalAbsences = 0;
                 let totalGrades = 0;
                 let gradeCount = 0;
                 let subjects = {};
 
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('diary_')) {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        totalDays++;
-                        
-                        if (data.absence) totalAbsences++;
-                        
-                        if (data.grade && !isNaN(data.grade)) {
-                            totalGrades += parseInt(data.grade);
-                            gradeCount++;
+                records.forEach(record => {
+                    if (record.absence) totalAbsences++;
+                    
+                    if (record.grade && !isNaN(record.grade)) {
+                        totalGrades += parseInt(record.grade);
+                        gradeCount++;
+                    }
+                    
+                    // Считаем статистику по предметам
+                    if (record.subject) {
+                        if (!subjects[record.subject]) {
+                            subjects[record.subject] = { count: 0, grades: 0, gradeCount: 0 };
                         }
+                        subjects[record.subject].count++;
                         
-                        // Считаем статистику по предметам
-                        if (data.subject && data.subject !== '—') {
-                            if (!subjects[data.subject]) {
-                                subjects[data.subject] = { count: 0, grades: 0, gradeCount: 0 };
-                            }
-                            subjects[data.subject].count++;
-                            
-                            if (data.grade && !isNaN(data.grade)) {
-                                subjects[data.subject].grades += parseInt(data.grade);
-                                subjects[data.subject].gradeCount++;
-                            }
+                        if (record.grade && !isNaN(record.grade)) {
+                            subjects[record.subject].grades += parseInt(record.grade);
+                            subjects[record.subject].gradeCount++;
                         }
                     }
-                }
+                });
 
                 document.getElementById('stat-total-days').textContent = totalDays;
                 document.getElementById('stat-total-absences').textContent = totalAbsences;
@@ -927,7 +907,7 @@
                 
                 for (const subject in subjects) {
                     const count = subjects[subject].count;
-                    const width = (count / totalDays * 100).toFixed(1);
+                    const width = totalDays > 0 ? (count / totalDays * 100).toFixed(1) : 0;
                     
                     chartHtml += `
                         <div style="display: flex; align-items: center;">
@@ -941,28 +921,18 @@
                 }
                 
                 chartHtml += '</div>';
-                document.getElementById('subjects-chart').innerHTML = chartHtml;
+                document.getElementById('subjects-chart').innerHTML = totalDays > 0 ? chartHtml : '<p style="text-align: center;">Нет данных для отображения</p>';
             }
 
             // === Архив ===
             function loadArchive() {
-                allRecords = [];
-                
-                // Собираем все записи
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key.startsWith('diary_')) {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        data.date = key.replace('diary_', '');
-                        allRecords.push(data);
-                    }
-                }
+                allRecords = JSON.parse(localStorage.getItem('diary_records')) || [];
                 
                 // Применяем фильтры
                 const searchText = document.getElementById('archive-search').value.toLowerCase();
                 const subjectFilter = document.getElementById('filter-subject').value;
                 const gradeFilter = document.getElementById('filter-grade').value;
-                const absenceFilter = document.getElementById('filter-absence').value;
+                const periodFilter = document.getElementById('filter-period').value;
                 
                 filteredRecords = allRecords.filter(record => {
                     // Поиск по тексту
@@ -982,12 +952,28 @@
                         return false;
                     }
                     
-                    // Фильтр по пропуску
-                    if (absenceFilter) {
-                        if (absenceFilter === 'other' && !record.absence) {
-                            return false;
+                    // Фильтр по периоду
+                    if (periodFilter) {
+                        const recordDate = new Date(record.date);
+                        const today = new Date();
+                        let startDate;
+                        
+                        switch(periodFilter) {
+                            case 'week':
+                                startDate = new Date(today.setDate(today.getDate() - 7));
+                                break;
+                            case 'month':
+                                startDate = new Date(today.setMonth(today.getMonth() - 1));
+                                break;
+                            case 'quarter':
+                                startDate = new Date(today.setMonth(today.getMonth() - 3));
+                                break;
+                            case 'year':
+                                startDate = new Date(today.setFullYear(today.getFullYear() - 1));
+                                break;
                         }
-                        if (absenceFilter !== 'other' && record.absence !== absenceFilter) {
+                        
+                        if (recordDate < startDate) {
                             return false;
                         }
                     }
@@ -1045,7 +1031,7 @@
                         <td>${getAbsenceText(record.absence)}</td>
                         <td>${record.comment}</td>
                         <td>
-                            <button class="delete-btn" onclick="deleteRecord('${record.date}')">Удалить</button>
+                            <button class="delete-btn" onclick="deleteRecord('${record.id}')">Удалить</button>
                         </td>
                     `;
                 });
@@ -1101,18 +1087,25 @@
             }
 
             // Удаление записи
-            window.deleteRecord = function(date) {
-                if (confirm('Удалить запись за ' + formatDate(date) + '?')) {
-                    localStorage.removeItem(`diary_${date}`);
+            window.deleteRecord = function(id) {
+                if (confirm('Удалить эту запись?')) {
+                    let records = JSON.parse(localStorage.getItem('diary_records')) || [];
+                    records = records.filter(record => record.id !== id);
+                    localStorage.setItem('diary_records', JSON.stringify(records));
+                    
                     loadArchive();
                     updateStats();
-                    loadDataForDate(document.getElementById('date-selector').value);
                     
                     if (document.getElementById('stats').classList.contains('active')) {
                         loadStats();
                     }
+                    
+                    alert('Запись удалена!');
                 }
             };
+            
+            // Инициализация архива при загрузке
+            loadArchive();
         });
     </script>
 </body>
