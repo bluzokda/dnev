@@ -405,7 +405,7 @@
 
                     <div class="actions">
                         <button class="btn btn-primary" id="save-btn">
-                            <i class="fas fa-save"></i> Сохранить
+                            <i class="fas fa-save"></i> Добавить
                         </button>
                         <button class="btn btn-warning" id="load-btn">
                             <i class="fas fa-sync"></i> Загрузить
@@ -416,7 +416,7 @@
                     </div>
 
                     <div class="record-display" id="record-display" style="display: none;">
-                        <h3>Сохранённая запись:</h3>
+                        <h3>Последняя запись:</h3>
                         <p><strong>Дата:</strong> <span id="display-date"></span></p>
                         <p><strong>Предмет:</strong> <span id="display-subject"></span></p>
                         <p><strong>Оценка:</strong> <span id="display-grade"></span></p>
@@ -430,8 +430,8 @@
                             <div class="stat-value" id="avg-grade">-</div>
                         </div>
                         <div class="stat-card">
-                            <h3>Всего дней</h3>
-                            <div class="stat-value" id="total-days">0</div>
+                            <h3>Всего записей</h3>
+                            <div class="stat-value" id="total-records">0</div>
                         </div>
                         <div class="stat-card">
                             <h3>Пропусков</h3>
@@ -493,19 +493,21 @@
                 });
             });
 
-            // Загрузка данных при старте
+            // Инициализация
             loadDataForDate(today);
             updateStats();
 
-            // Обработчики событий
+            // Обновление при смене даты
             dateInput.addEventListener('change', function() {
                 loadDataForDate(this.value);
             });
 
+            // Кнопка "Загрузить"
             document.getElementById('load-btn').addEventListener('click', function() {
                 loadDataForDate(dateInput.value);
             });
 
+            // Кнопка "Добавить"
             document.getElementById('save-btn').addEventListener('click', function() {
                 saveData(dateInput.value);
                 loadDataForDate(dateInput.value);
@@ -513,9 +515,10 @@
                 if (document.querySelector('.nav-item.active')?.dataset?.tab === 'archive') {
                     loadArchive();
                 }
-                alert('✅ Запись сохранена!');
+                alert('✅ Запись добавлена!');
             });
 
+            // Очистка формы
             document.getElementById('reset-btn').addEventListener('click', function() {
                 if (confirm('Очистить форму?')) {
                     clearForm();
@@ -525,30 +528,35 @@
             // === Функции ===
             function saveData(date) {
                 const data = {
-                    date: date,
                     subject: document.getElementById('subject').value || '—',
                     grade: document.getElementById('grade').value || '—',
                     absence: document.getElementById('absence').value || '',
                     comment: document.getElementById('comment').value || '—',
                 };
-                localStorage.setItem(`diary_${date}`, JSON.stringify(data));
+
+                const entries = JSON.parse(localStorage.getItem(`diary_${date}`)) || [];
+                entries.push(data);
+                localStorage.setItem(`diary_${date}`, JSON.stringify(entries));
+
+                clearForm();
             }
 
             function loadDataForDate(date) {
-                const data = JSON.parse(localStorage.getItem(`diary_${date}`));
+                const entries = JSON.parse(localStorage.getItem(`diary_${date}`)) || [];
                 const display = document.getElementById('record-display');
 
-                if (data) {
-                    document.getElementById('subject').value = data.subject;
-                    document.getElementById('grade').value = data.grade;
-                    document.getElementById('absence').value = data.absence || '';
-                    document.getElementById('comment').value = data.comment;
+                if (entries.length > 0) {
+                    const last = entries[entries.length - 1];
+                    document.getElementById('subject').value = last.subject;
+                    document.getElementById('grade').value = last.grade;
+                    document.getElementById('absence').value = last.absence || '';
+                    document.getElementById('comment').value = last.comment;
 
                     document.getElementById('display-date').textContent = formatDate(date);
-                    document.getElementById('display-subject').textContent = data.subject;
-                    document.getElementById('display-grade').textContent = getGradeText(data.grade);
-                    document.getElementById('display-absence').textContent = getAbsenceText(data.absence);
-                    document.getElementById('display-comment').textContent = data.comment;
+                    document.getElementById('display-subject').textContent = last.subject;
+                    document.getElementById('display-grade').textContent = getGradeText(last.grade);
+                    document.getElementById('display-absence').textContent = getAbsenceText(last.absence);
+                    document.getElementById('display-comment').textContent = last.comment;
 
                     display.style.display = 'block';
                 } else {
@@ -594,7 +602,7 @@
             }
 
             function updateStats() {
-                let totalDays = 0;
+                let totalRecords = 0;
                 let totalAbsences = 0;
                 let totalGrades = 0;
                 let gradeCount = 0;
@@ -602,17 +610,19 @@
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
                     if (key.startsWith('diary_')) {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        totalDays++;
-                        if (data.absence) totalAbsences++;
-                        if (data.grade && !isNaN(data.grade)) {
-                            totalGrades += parseInt(data.grade);
-                            gradeCount++;
-                        }
+                        const entries = JSON.parse(localStorage.getItem(key)) || [];
+                        totalRecords += entries.length;
+                        entries.forEach(entry => {
+                            if (entry.absence) totalAbsences++;
+                            if (entry.grade && !isNaN(entry.grade)) {
+                                totalGrades += parseInt(entry.grade);
+                                gradeCount++;
+                            }
+                        });
                     }
                 }
 
-                document.getElementById('total-days').textContent = totalDays;
+                document.getElementById('total-records').textContent = totalRecords;
                 document.getElementById('total-absences').textContent = totalAbsences;
                 document.getElementById('avg-grade').textContent = gradeCount > 0 ? (totalGrades / gradeCount).toFixed(1) : '—';
             }
@@ -632,9 +642,12 @@
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
                     if (key.startsWith('diary_')) {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        allData.push(data);
-                        subjectsMap[data.subject] = (subjectsMap[data.subject] || 0) + 1;
+                        const date = key.split('_')[1];
+                        const entries = JSON.parse(localStorage.getItem(key)) || [];
+                        entries.forEach(entry => {
+                            allData.push({ date, ...entry });
+                            subjectsMap[entry.subject] = (subjectsMap[entry.subject] || 0) + 1;
+                        });
                     }
                 }
 
@@ -651,12 +664,12 @@
                         <td>${getAbsenceText(data.absence)}</td>
                         <td>${data.comment}</td>
                         <td>
-                            <button class="delete-btn" onclick="deleteRecord('${data.date}')">Удалить</button>
+                            <button class="delete-btn" onclick="deleteRecord('${data.date}', '${escapeString(data.subject)}', '${data.grade}', '${data.absence}', '${escapeString(data.comment)}')">Удалить</button>
                         </td>
                     `;
                 });
 
-                // Заполняем список предметов (по убыванию количества)
+                // Заполняем список предметов
                 Object.entries(subjectsMap)
                     .sort((a, b) => b[1] - a[1])
                     .forEach(([subject, count]) => {
@@ -667,7 +680,7 @@
                         subjectsList.appendChild(div);
                     });
 
-                // Поиск по предмету
+                // Поиск
                 searchInput.oninput = () => {
                     const query = searchInput.value.toLowerCase();
                     document.querySelectorAll('.subject-item').forEach(el => {
@@ -675,6 +688,11 @@
                         el.style.display = text.includes(query) ? 'block' : 'none';
                     });
                 };
+            }
+
+            // Экранирование строк для атрибутов onclick
+            function escapeString(str) {
+                return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
             }
 
             // Фильтрация архива по предмету
@@ -685,32 +703,41 @@
                 for (let i = 0; i < localStorage.length; i++) {
                     const key = localStorage.key(i);
                     if (key.startsWith('diary_')) {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        if (data.subject === subject) {
-                            const row = tbody.insertRow();
-                            row.innerHTML = `
-                                <td>${formatDate(data.date)}</td>
-                                <td>${data.subject}</td>
-                                <td>${getGradeText(data.grade)}</td>
-                                <td>${getAbsenceText(data.absence)}</td>
-                                <td>${data.comment}</td>
-                                <td>
-                                    <button class="delete-btn" onclick="deleteRecord('${data.date}')">Удалить</button>
-                                </td>
-                            `;
-                        }
+                        const date = key.split('_')[1];
+                        const entries = JSON.parse(localStorage.getItem(key)) || [];
+                        entries.forEach(entry => {
+                            if (entry.subject === subject) {
+                                const row = tbody.insertRow();
+                                row.innerHTML = `
+                                    <td>${formatDate(date)}</td>
+                                    <td>${entry.subject}</td>
+                                    <td>${getGradeText(entry.grade)}</td>
+                                    <td>${getAbsenceText(entry.absence)}</td>
+                                    <td>${entry.comment}</td>
+                                    <td>
+                                        <button class="delete-btn" onclick="deleteRecord('${date}', '${escapeString(entry.subject)}', '${entry.grade}', '${entry.absence}', '${escapeString(entry.comment)}')">Удалить</button>
+                                    </td>
+                                `;
+                            }
+                        });
                     }
                 }
             };
 
-            // Удаление записи
-            window.deleteRecord = function(date) {
-                if (confirm('Удалить запись за ' + formatDate(date) + '?')) {
-                    localStorage.removeItem(`diary_${date}`);
-                    loadArchive();
-                    updateStats();
-                    loadDataForDate(document.getElementById('date-selector').value);
-                }
+            // Удаление одной записи
+            window.deleteRecord = function(date, subject, grade, absence, comment) {
+                const key = `diary_${date}`;
+                const entries = JSON.parse(localStorage.getItem(key)) || [];
+                const filtered = entries.filter(e => 
+                    !(e.subject === subject && 
+                      e.grade === grade && 
+                      e.absence === absence && 
+                      e.comment === comment)
+                );
+                localStorage.setItem(key, JSON.stringify(filtered));
+                loadArchive();
+                updateStats();
+                loadDataForDate(document.getElementById('date-selector').value);
             };
         });
     </script>
