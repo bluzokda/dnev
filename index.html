@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Дневник - Улучшенные уведомления</title>
+    <title>Мой Дневник - Анимированный фон</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,33 +14,154 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #333;
             min-height: 100vh;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Анимированный фон с частицами */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+            background: rgba(100, 100, 255, 0.15);
+        }
+        
+        .particle:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            left: 80%;
+            animation-delay: -2s;
+            background: rgba(255, 100, 100, 0.1);
+        }
+        
+        .particle:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            top: 30%;
+            left: 70%;
+            animation-delay: -5s;
+            background: rgba(100, 255, 200, 0.1);
+        }
+        
+        .particle:nth-child(4) {
+            width: 90px;
+            height: 90px;
+            top: 60%;
+            left: 15%;
+            animation-delay: -7s;
+            background: rgba(200, 100, 255, 0.1);
+        }
+        
+        .particle:nth-child(5) {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            left: 50%;
+            animation-delay: -10s;
+            background: rgba(255, 200, 100, 0.1);
+        }
+        
+        .particle:nth-child(6) {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 40%;
+            animation-delay: -12s;
+            background: rgba(100, 255, 255, 0.1);
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(20px, 40px) rotate(5deg);
+            }
+            50% {
+                transform: translate(-30px, 60px) rotate(-5deg);
+            }
+            75% {
+                transform: translate(10px, -30px) rotate(3deg);
+            }
+        }
+        
+        .glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(37, 117, 252, 0.2) 0%, rgba(106, 17, 203, 0.1) 40%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: pulse 10s infinite alternate;
+            z-index: -1;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
         }
         
         .container {
             width: 100%;
             max-width: 1400px;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         header {
-            background: #3a4f76;
+            background: rgba(58, 79, 118, 0.9);
             color: white;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            backdrop-filter: blur(5px);
         }
         
         .logo {
@@ -55,16 +176,21 @@
         
         .logo h1 {
             font-size: 1.8rem;
+            background: linear-gradient(45deg, #fff, #a0c3ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .date-selector {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: white;
+            background: rgba(255, 255, 255, 0.9);
             padding: 8px 15px;
             border-radius: 30px;
             color: #3a4f76;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         
         .date-selector input {
@@ -72,6 +198,7 @@
             font-size: 1rem;
             color: #3a4f76;
             font-weight: 500;
+            background: transparent;
         }
         
         .main-content {
@@ -81,9 +208,10 @@
         
         .sidebar {
             width: 250px;
-            background: #f0f4f8;
+            background: rgba(240, 244, 248, 0.8);
             padding: 20px;
-            border-right: 1px solid #ddd;
+            border-right: 1px solid rgba(221, 221, 221, 0.5);
+            backdrop-filter: blur(5px);
         }
         
         .sidebar h3 {
@@ -107,6 +235,7 @@
         .nav-item:hover, .nav-item.active {
             background: #3a4f76;
             color: white;
+            transform: translateX(5px);
         }
         
         .content {
@@ -119,6 +248,12 @@
         /* Вкладки */
         .tab {
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .tab.active {
@@ -141,10 +276,21 @@
         .form-group textarea,
         .form-group input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1rem;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-group select:focus,
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #3a4f76;
+            box-shadow: 0 0 0 2px rgba(58, 79, 118, 0.2);
+            transform: translateY(-2px);
         }
         
         .form-group textarea {
@@ -162,7 +308,7 @@
         .btn {
             padding: 12px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 500;
@@ -170,41 +316,41 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .btn-primary {
-            background: #4CAF50;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #45a049;
         }
         
         .btn-secondary {
-            background: #f44336;
+            background: linear-gradient(135deg, #f44336, #d32f2f);
             color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #d32f2f;
         }
         
         .btn-warning {
-            background: #ff9800;
+            background: linear-gradient(135deg, #ff9800, #e68a00);
             color: white;
         }
         
-        .btn-warning:hover {
-            background: #e68a00;
-        }
-        
         .record-display {
-            background: #e8f0fe;
+            background: rgba(232, 240, 254, 0.7);
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
             border-left: 4px solid #3a4f76;
+            backdrop-filter: blur(5px);
         }
         
         .record-display p {
@@ -224,11 +370,18 @@
         }
         
         .stat-card {
-            background: #f0f7ff;
+            background: rgba(240, 247, 255, 0.8);
             padding: 15px;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid #d0e3ff;
+            border: 1px solid rgba(208, 227, 255, 0.5);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
         
         .stat-card h3 {
@@ -282,6 +435,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
         }
         
         .search-input {
@@ -294,11 +448,12 @@
         }
         
         .archive-info {
-            background: #e8f0fe;
+            background: rgba(232, 240, 254, 0.7);
             padding: 10px 15px;
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 0.9rem;
+            backdrop-filter: blur(5px);
         }
         
         .archive-table {
@@ -314,23 +469,24 @@
         }
         
         .archive-table th {
-            background-color: #3a4f76;
+            background-color: rgba(58, 79, 118, 0.9);
             color: white;
             position: sticky;
             top: 0;
             cursor: pointer;
+            backdrop-filter: blur(5px);
         }
         
         .archive-table th:hover {
-            background-color: #2c3e5a;
+            background-color: rgba(44, 62, 90, 0.9);
         }
         
         .archive-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: rgba(249, 249, 249, 0.7);
         }
         
         .archive-table tr:hover {
-            background-color: #f1f1f1;
+            background-color: rgba(241, 241, 241, 0.8);
         }
         
         .delete-btn {
@@ -341,10 +497,12 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.9rem;
+            transition: all 0.3s;
         }
         
         .delete-btn:hover {
             background: #d32f2f;
+            transform: scale(1.05);
         }
         
         .pagination {
@@ -360,6 +518,11 @@
             background: white;
             border-radius: 4px;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .pagination-btn:hover {
+            background: #f0f0f0;
         }
         
         .pagination-btn.active {
@@ -403,6 +566,7 @@
             transform: translateX(100%);
             opacity: 0;
             transition: transform 0.3s ease, opacity 0.3s ease;
+            backdrop-filter: blur(5px);
         }
         
         .notification.show {
@@ -411,19 +575,19 @@
         }
         
         .notification.success {
-            background: #4CAF50;
+            background: rgba(76, 175, 80, 0.9);
         }
         
         .notification.error {
-            background: #f44336;
+            background: rgba(244, 67, 54, 0.9);
         }
         
         .notification.warning {
-            background: #ff9800;
+            background: rgba(255, 152, 0, 0.9);
         }
         
         .notification.info {
-            background: #2196F3;
+            background: rgba(33, 150, 243, 0.9);
         }
         
         .notification-icon {
@@ -450,7 +614,7 @@
             .sidebar {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid #ddd;
+                border-bottom: 1px solid rgba(221, 221, 221, 0.5);
             }
             
             .archive-controls {
@@ -476,6 +640,19 @@
     </style>
 </head>
 <body>
+    <!-- Анимированный фон -->
+    <div class="background">
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="glow"></div>
+    </div>
+    
     <div class="container">
         <!-- Контейнер для уведомлений -->
         <div class="notification-container" id="notification-container">
@@ -719,7 +896,7 @@
                     </div>
                     
                     <h4 style="margin-top: 30px;">Распределение по предметам</h4>
-                    <div id="subjects-chart" style="height: 300px; margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                    <div id="subjects-chart" style="height: 300px; margin-top: 20px; background: rgba(249, 249, 249, 0.7); padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);">
                         <!-- График будет здесь -->
                         <p style="text-align: center; padding: 40px;">График загружается...</p>
                     </div>
