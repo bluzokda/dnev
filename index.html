@@ -625,6 +625,79 @@
             font-size: 1rem;
         }
         
+        /* Стили для расписания */
+        .schedule-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .schedule-table th, .schedule-table td {
+            border: 1px solid rgba(126, 181, 255, 0.3);
+            padding: 12px;
+            text-align: center;
+            color: #e6e6e6;
+        }
+        
+        .schedule-table th {
+            background-color: rgba(40, 44, 62, 0.9);
+            color: #7eb5ff;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(5px);
+        }
+        
+        .schedule-table th.day-header {
+            background-color: rgba(58, 79, 118, 0.7);
+        }
+        
+        .schedule-table th.lesson-header {
+            background-color: rgba(40, 44, 62, 0.9);
+        }
+        
+        .schedule-table td {
+            background-color: rgba(40, 44, 62, 0.5);
+            transition: all 0.3s;
+        }
+        
+        .schedule-table td:hover {
+            background-color: rgba(50, 54, 72, 0.7);
+        }
+        
+        .schedule-input {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            background: transparent;
+            color: #e6e6e6;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .schedule-input:focus {
+            outline: none;
+            background: rgba(126, 181, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .current-week {
+            font-weight: 500;
+            color: #7eb5ff;
+            background: rgba(40, 44, 62, 0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(126, 181, 255, 0.3);
+        }
+        
         @media (max-width: 900px) {
             .main-content {
                 flex-direction: column;
@@ -654,6 +727,18 @@
                 max-width: 300px;
                 right: 10px;
                 bottom: 10px;
+            }
+            
+            .schedule-table {
+                font-size: 0.8rem;
+            }
+            
+            .schedule-table th, .schedule-table td {
+                padding: 8px 4px;
+            }
+            
+            .schedule-input {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -695,6 +780,10 @@
                 <div class="nav-item active" data-tab="main">
                     <i class="fas fa-home"></i>
                     <span>Главная</span>
+                </div>
+                <div class="nav-item" data-tab="schedule">
+                    <i class="fas fa-calendar"></i>
+                    <span>Расписание</span>
                 </div>
                 <div class="nav-item" data-tab="archive">
                     <i class="fas fa-archive"></i>
@@ -787,6 +876,37 @@
                             <div class="stat-value" id="total-absences">0</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- === Расписание вкладка === -->
+                <div class="tab" id="schedule">
+                    <h3>Расписание уроков</h3>
+                    
+                    <div class="schedule-controls">
+                        <div class="current-week">
+                            <i class="fas fa-calendar-week"></i>
+                            <span>Текущая неделя</span>
+                        </div>
+                        <button class="btn btn-primary" id="save-schedule">
+                            <i class="fas fa-save"></i> Сохранить расписание
+                        </button>
+                    </div>
+
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th class="lesson-header">Урок</th>
+                                <th class="day-header">Понедельник</th>
+                                <th class="day-header">Вторник</th>
+                                <th class="day-header">Среда</th>
+                                <th class="day-header">Четверг</th>
+                                <th class="day-header">Пятница</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schedule-body">
+                            <!-- Расписание будет здесь -->
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- === Архив вкладка === -->
@@ -950,6 +1070,8 @@
                         loadArchive();
                     } else if (item.getAttribute('data-tab') === 'stats') {
                         loadStats();
+                    } else if (item.getAttribute('data-tab') === 'schedule') {
+                        loadSchedule();
                     }
                 });
             });
@@ -1027,6 +1149,12 @@
                     document.getElementById('sort-by').value = newSort;
                     loadArchive();
                 });
+            });
+
+            // Обработчик для сохранения расписания
+            document.getElementById('save-schedule').addEventListener('click', function() {
+                saveSchedule();
+                showNotification('Расписание сохранено!', 'success');
             });
 
             // === Функции ===
@@ -1358,6 +1486,77 @@
                 }
             }
 
+            // === Расписание ===
+            function loadSchedule() {
+                const scheduleBody = document.getElementById('schedule-body');
+                scheduleBody.innerHTML = '';
+                
+                // Загружаем расписание из localStorage
+                let scheduleData = JSON.parse(localStorage.getItem('diary_schedule')) || {};
+                
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                const dayNames = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
+                
+                // Создаем 8 строк для уроков
+                for (let i = 1; i <= 8; i++) {
+                    const row = document.createElement('tr');
+                    
+                    // Добавляем номер урока
+                    const lessonCell = document.createElement('td');
+                    lessonCell.textContent = i;
+                    lessonCell.style.fontWeight = 'bold';
+                    lessonCell.style.color = '#7eb5ff';
+                    row.appendChild(lessonCell);
+                    
+                    // Добавляем ячейки для каждого дня
+                    days.forEach((day, index) => {
+                        const cell = document.createElement('td');
+                        
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'schedule-input';
+                        input.placeholder = 'Предмет';
+                        input.setAttribute('data-day', day);
+                        input.setAttribute('data-lesson', i);
+                        
+                        // Заполняем значение, если есть в сохраненных данных
+                        if (scheduleData[day] && scheduleData[day][i]) {
+                            input.value = scheduleData[day][i];
+                        }
+                        
+                        cell.appendChild(input);
+                        row.appendChild(cell);
+                    });
+                    
+                    scheduleBody.appendChild(row);
+                }
+            }
+            
+            function saveSchedule() {
+                const inputs = document.querySelectorAll('.schedule-input');
+                const scheduleData = {};
+                
+                // Инициализируем структуру для дней недели
+                const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+                days.forEach(day => {
+                    scheduleData[day] = {};
+                });
+                
+                // Собираем данные из всех полей ввода
+                inputs.forEach(input => {
+                    const day = input.getAttribute('data-day');
+                    const lesson = input.getAttribute('data-lesson');
+                    const value = input.value.trim();
+                    
+                    if (value) {
+                        scheduleData[day][lesson] = value;
+                    }
+                });
+                
+                // Сохраняем в localStorage
+                localStorage.setItem('diary_schedule', JSON.stringify(scheduleData));
+            }
+
             // Функция для показа уведомлений
             function showNotification(message, type = 'info') {
                 const notificationContainer = document.getElementById('notification-container');
@@ -1425,6 +1624,8 @@
             
             // Инициализация архива при загрузке
             loadArchive();
+            // Инициализация расписания при загрузке
+            loadSchedule();
         });
     </script>
 </body>
