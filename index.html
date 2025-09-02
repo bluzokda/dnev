@@ -707,6 +707,60 @@
             font-size: 1rem;
         }
         
+        /* Новые стили для таблицы средних оценок */
+        .avg-grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(40, 44, 62, 0.7);
+            border-radius: 8px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        
+        .avg-grades-table th, .avg-grades-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(126, 181, 255, 0.2);
+            color: #e6e6e6;
+        }
+        
+        .avg-grades-table th {
+            background-color: rgba(40, 44, 62, 0.9);
+            color: #7eb5ff;
+            font-weight: 600;
+        }
+        
+        .avg-grades-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .avg-grades-table tr:hover {
+            background-color: rgba(50, 54, 72, 0.5);
+        }
+        
+        .subject-name {
+            font-weight: 500;
+            color: #a0c3ff;
+        }
+        
+        .subject-avg {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .subject-avg.high {
+            color: #4CAF50;
+        }
+        
+        .subject-avg.medium {
+            color: #FFC107;
+        }
+        
+        .subject-avg.low {
+            color: #F44336;
+        }
+        
         /* Адаптивность для мобильных устройств */
         @media (max-width: 768px) {
             body {
@@ -821,6 +875,15 @@
                 max-width: 300px;
                 right: 10px;
                 bottom: 10px;
+            }
+            
+            .avg-grades-table {
+                font-size: 0.8rem;
+            }
+            
+            .avg-grades-table th, 
+            .avg-grades-table td {
+                padding: 8px;
             }
         }
     </style>
@@ -1128,6 +1191,11 @@
                         <!-- График будет здесь -->
                         <p style="text-align: center; padding: 40px; color: #a0a0b0;">График загружается...</p>
                     </div>
+                    
+                    <h4 style="margin-top: 30px; color: #a0c3ff;">Средние оценки по предметам</h4>
+                    <div id="subject-averages-table" style="margin-top: 20px;">
+                        <!-- Таблица будет здесь -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1431,6 +1499,92 @@
                 
                 chartHtml += '</div>';
                 document.getElementById('subjects-chart').innerHTML = totalDays > 0 ? chartHtml : '<p style="text-align: center; color: #a0a0b0;">Нет данных для отображения</p>';
+                
+                // Отрисовываем таблицу средних оценок
+                renderSubjectAverages(subjects);
+            }
+            
+            // Новая функция для отображения средней оценки по предметам
+            function renderSubjectAverages(subjects) {
+                // Создаем контейнер для таблицы, если его еще нет
+                let tableContainer = document.getElementById('subject-averages-table');
+                
+                if (!tableContainer) {
+                    tableContainer = document.createElement('div');
+                    tableContainer.id = 'subject-averages-table';
+                    tableContainer.style.marginTop = '30px';
+                    
+                    const heading = document.createElement('h4');
+                    heading.style.color = '#a0c3ff';
+                    heading.style.marginBottom = '15px';
+                    heading.innerHTML = '<i class="fas fa-star"></i> Средние оценки по предметам';
+                    
+                    tableContainer.appendChild(heading);
+                    
+                    const table = document.createElement('table');
+                    table.className = 'avg-grades-table';
+                    table.id = 'avg-grades-table';
+                    tableContainer.appendChild(table);
+                    
+                    // Вставляем таблицу после графика
+                    document.getElementById('subjects-chart').parentNode.insertBefore(tableContainer, document.getElementById('subjects-chart').nextSibling);
+                }
+                
+                const table = document.getElementById('avg-grades-table');
+                table.innerHTML = '';
+                
+                // Создаем заголовок таблицы
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr>
+                        <th>Предмет</th>
+                        <th>Количество оценок</th>
+                        <th>Средняя оценка</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+                
+                // Создаем тело таблицы
+                const tbody = document.createElement('tbody');
+                
+                // Сортируем предметы по средней оценке (по убыванию)
+                const sortedSubjects = Object.entries(subjects).sort((a, b) => {
+                    const avgA = a[1].gradeCount > 0 ? a[1].grades / a[1].gradeCount : 0;
+                    const avgB = b[1].gradeCount > 0 ? b[1].grades / b[1].gradeCount : 0;
+                    return avgB - avgA;
+                });
+                
+                // Заполняем таблицу данными
+                sortedSubjects.forEach(([subject, data]) => {
+                    // Пропускаем предметы без оценок
+                    if (data.gradeCount === 0) return;
+                    
+                    const row = document.createElement('tr');
+                    
+                    const avg = (data.grades / data.gradeCount).toFixed(1);
+                    let avgClass = '';
+                    if (avg >= 4.5) avgClass = 'high';
+                    else if (avg >= 3.5) avgClass = 'medium';
+                    else avgClass = 'low';
+                    
+                    row.innerHTML = `
+                        <td class="subject-name">${subject}</td>
+                        <td>${data.gradeCount}</td>
+                        <td class="subject-avg ${avgClass}">${avg}</td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                });
+                
+                table.appendChild(tbody);
+                
+                // Если нет данных, показываем сообщение
+                if (tbody.children.length === 0) {
+                    table.innerHTML = '';
+                    const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="3" style="text-align: center; padding: 20px; color: #a0a0b0;">Нет данных для отображения</td>';
+                    table.appendChild(row);
+                }
             }
 
             // === Архив ===
