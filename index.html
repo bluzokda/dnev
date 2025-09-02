@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Дневник - Анимированный фон</title>
+    <title>Мой Дневник - Темная тема</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,8 +14,8 @@
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #333;
+            background: linear-gradient(135deg, #0d0d17 0%, #0a0a1f 100%);
+            color: #e6e6e6;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -44,7 +44,7 @@
         
         .particle {
             position: absolute;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 50%;
             animation: float 15s infinite ease-in-out;
         }
@@ -55,7 +55,7 @@
             top: 10%;
             left: 10%;
             animation-delay: 0s;
-            background: rgba(100, 100, 255, 0.15);
+            background: rgba(80, 80, 200, 0.1);
         }
         
         .particle:nth-child(2) {
@@ -64,7 +64,7 @@
             top: 70%;
             left: 80%;
             animation-delay: -2s;
-            background: rgba(255, 100, 100, 0.1);
+            background: rgba(200, 80, 80, 0.08);
         }
         
         .particle:nth-child(3) {
@@ -73,7 +73,7 @@
             top: 30%;
             left: 70%;
             animation-delay: -5s;
-            background: rgba(100, 255, 200, 0.1);
+            background: rgba(80, 200, 160, 0.08);
         }
         
         .particle:nth-child(4) {
@@ -82,7 +82,7 @@
             top: 60%;
             left: 15%;
             animation-delay: -7s;
-            background: rgba(200, 100, 255, 0.1);
+            background: rgba(160, 80, 200, 0.08);
         }
         
         .particle:nth-child(5) {
@@ -91,7 +91,7 @@
             top: 20%;
             left: 50%;
             animation-delay: -10s;
-            background: rgba(255, 200, 100, 0.1);
+            background: rgba(200, 160, 80, 0.08);
         }
         
         .particle:nth-child(6) {
@@ -100,7 +100,7 @@
             top: 80%;
             left: 40%;
             animation-delay: -12s;
-            background: rgba(100, 255, 255, 0.1);
+            background: rgba(80, 200, 200, 0.08);
         }
         
         @keyframes float {
@@ -124,7 +124,7 @@
             left: 50%;
             width: 500px;
             height: 500px;
-            background: radial-gradient(circle, rgba(37, 117, 252, 0.2) 0%, rgba(106, 17, 203, 0.1) 40%, transparent 70%);
+            background: radial-gradient(circle, rgba(30, 90, 200, 0.15) 0%, rgba(80, 20, 150, 0.1) 40%, transparent 70%);
             transform: translate(-50%, -50%);
             animation: pulse 10s infinite alternate;
             z-index: -1;
@@ -132,11 +132,11 @@
         
         @keyframes pulse {
             0% {
-                opacity: 0.5;
+                opacity: 0.4;
                 transform: translate(-50%, -50%) scale(1);
             }
             100% {
-                opacity: 0.8;
+                opacity: 0.6;
                 transform: translate(-50%, -50%) scale(1.2);
             }
         }
@@ -144,17 +144,17 @@
         .container {
             width: 100%;
             max-width: 1400px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 46, 0.95);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             overflow: hidden;
             position: relative;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         header {
-            background: rgba(58, 79, 118, 0.9);
+            background: rgba(40, 44, 62, 0.95);
             color: white;
             padding: 20px;
             display: flex;
@@ -162,6 +162,7 @@
             align-items: center;
             flex-wrap: wrap;
             backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .logo {
@@ -172,33 +173,39 @@
         
         .logo i {
             font-size: 2rem;
+            color: #7eb5ff;
         }
         
         .logo h1 {
             font-size: 1.8rem;
-            background: linear-gradient(45deg, #fff, #a0c3ff);
+            background: linear-gradient(45deg, #a0c3ff, #7eb5ff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .date-selector {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(30, 30, 46, 0.9);
             padding: 8px 15px;
             border-radius: 30px;
-            color: #3a4f76;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #a0c3ff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(126, 181, 255, 0.3);
         }
         
         .date-selector input {
             border: none;
             font-size: 1rem;
-            color: #3a4f76;
+            color: #e6e6e6;
             font-weight: 500;
             background: transparent;
+        }
+        
+        .date-selector input:focus {
+            outline: none;
         }
         
         .main-content {
@@ -208,17 +215,17 @@
         
         .sidebar {
             width: 250px;
-            background: rgba(240, 244, 248, 0.8);
+            background: rgba(35, 38, 52, 0.9);
             padding: 20px;
-            border-right: 1px solid rgba(221, 221, 221, 0.5);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(5px);
         }
         
         .sidebar h3 {
-            color: #3a4f76;
+            color: #7eb5ff;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #3a4f76;
+            border-bottom: 2px solid rgba(126, 181, 255, 0.5);
         }
         
         .nav-item {
@@ -230,12 +237,18 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            color: #c8c8d4;
         }
         
         .nav-item:hover, .nav-item.active {
-            background: #3a4f76;
-            color: white;
+            background: rgba(126, 181, 255, 0.2);
+            color: #7eb5ff;
             transform: translateX(5px);
+        }
+        
+        .nav-item i {
+            width: 20px;
+            text-align: center;
         }
         
         .content {
@@ -268,7 +281,7 @@
         .form-group label {
             display: block;
             margin-bottom: 6px;
-            color: #3a4f76;
+            color: #a0c3ff;
             font-weight: 500;
         }
         
@@ -277,19 +290,20 @@
         .form-group input {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ccc;
+            border: 1px solid rgba(126, 181, 255, 0.3);
             border-radius: 8px;
             font-size: 1rem;
             transition: all 0.3s;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(30, 30, 46, 0.8);
+            color: #e6e6e6;
         }
         
         .form-group select:focus,
         .form-group textarea:focus,
         .form-group input:focus {
             outline: none;
-            border-color: #3a4f76;
-            box-shadow: 0 0 0 2px rgba(58, 79, 118, 0.2);
+            border-color: #7eb5ff;
+            box-shadow: 0 0 0 2px rgba(126, 181, 255, 0.2);
             transform: translateY(-2px);
         }
         
@@ -316,17 +330,17 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
         }
         
         .btn:active {
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .btn-primary {
@@ -345,21 +359,22 @@
         }
         
         .record-display {
-            background: rgba(232, 240, 254, 0.7);
+            background: rgba(40, 44, 62, 0.7);
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
-            border-left: 4px solid #3a4f76;
+            border-left: 4px solid rgba(126, 181, 255, 0.5);
             backdrop-filter: blur(5px);
         }
         
         .record-display p {
             margin: 8px 0;
             font-size: 1.1rem;
+            color: #e6e6e6;
         }
         
         .record-display strong {
-            color: #3a4f76;
+            color: #7eb5ff;
         }
         
         .stats {
@@ -370,22 +385,22 @@
         }
         
         .stat-card {
-            background: rgba(240, 247, 255, 0.8);
+            background: rgba(40, 44, 62, 0.8);
             padding: 15px;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid rgba(208, 227, 255, 0.5);
+            border: 1px solid rgba(126, 181, 255, 0.2);
             backdrop-filter: blur(5px);
             transition: all 0.3s;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
         }
         
         .stat-card h3 {
-            color: #3a4f76;
+            color: #a0c3ff;
             margin-bottom: 10px;
             font-size: 0.9rem;
         }
@@ -393,7 +408,7 @@
         .stat-value {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #3a4f76;
+            color: #7eb5ff;
         }
 
         /* Архив - улучшенный */
@@ -426,16 +441,17 @@
         
         .filter-group label {
             font-size: 0.9rem;
-            color: #3a4f76;
+            color: #a0c3ff;
             font-weight: 500;
         }
         
         .search-input, .filter-select {
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid rgba(126, 181, 255, 0.3);
             border-radius: 5px;
             font-size: 1rem;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(30, 30, 46, 0.8);
+            color: #e6e6e6;
         }
         
         .search-input {
@@ -448,12 +464,13 @@
         }
         
         .archive-info {
-            background: rgba(232, 240, 254, 0.7);
+            background: rgba(40, 44, 62, 0.7);
             padding: 10px 15px;
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 0.9rem;
             backdrop-filter: blur(5px);
+            color: #e6e6e6;
         }
         
         .archive-table {
@@ -463,14 +480,15 @@
         }
         
         .archive-table th, .archive-table td {
-            border: 1px solid #ddd;
+            border: 1px solid rgba(126, 181, 255, 0.2);
             padding: 12px;
             text-align: left;
+            color: #e6e6e6;
         }
         
         .archive-table th {
-            background-color: rgba(58, 79, 118, 0.9);
-            color: white;
+            background-color: rgba(40, 44, 62, 0.9);
+            color: #7eb5ff;
             position: sticky;
             top: 0;
             cursor: pointer;
@@ -478,15 +496,15 @@
         }
         
         .archive-table th:hover {
-            background-color: rgba(44, 62, 90, 0.9);
+            background-color: rgba(50, 54, 72, 0.9);
         }
         
         .archive-table tr:nth-child(even) {
-            background-color: rgba(249, 249, 249, 0.7);
+            background-color: rgba(40, 44, 62, 0.5);
         }
         
         .archive-table tr:hover {
-            background-color: rgba(241, 241, 241, 0.8);
+            background-color: rgba(50, 54, 72, 0.7);
         }
         
         .delete-btn {
@@ -514,27 +532,28 @@
         
         .pagination-btn {
             padding: 8px 12px;
-            border: 1px solid #ddd;
-            background: white;
+            border: 1px solid rgba(126, 181, 255, 0.3);
+            background: rgba(40, 44, 62, 0.8);
+            color: #e6e6e6;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .pagination-btn:hover {
-            background: #f0f0f0;
+            background: rgba(50, 54, 72, 0.8);
         }
         
         .pagination-btn.active {
-            background: #3a4f76;
-            color: white;
-            border-color: #3a4f76;
+            background: rgba(126, 181, 255, 0.3);
+            color: #7eb5ff;
+            border-color: rgba(126, 181, 255, 0.5);
         }
         
         .no-records {
             text-align: center;
             padding: 30px;
-            color: #777;
+            color: #a0a0b0;
             font-style: italic;
         }
         
@@ -558,7 +577,7 @@
             padding: 15px 20px;
             border-radius: 8px;
             color: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -614,7 +633,7 @@
             .sidebar {
                 width: 100%;
                 border-right: none;
-                border-bottom: 1px solid rgba(221, 221, 221, 0.5);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
             
             .archive-controls {
@@ -895,10 +914,10 @@
                         </div>
                     </div>
                     
-                    <h4 style="margin-top: 30px;">Распределение по предметам</h4>
-                    <div id="subjects-chart" style="height: 300px; margin-top: 20px; background: rgba(249, 249, 249, 0.7); padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);">
+                    <h4 style="margin-top: 30px; color: #a0c3ff;">Распределение по предметам</h4>
+                    <div id="subjects-chart" style="height: 300px; margin-top: 20px; background: rgba(40, 44, 62, 0.7); padding: 15px; border-radius: 8px; backdrop-filter: blur(5px);">
                         <!-- График будет здесь -->
-                        <p style="text-align: center; padding: 40px;">График загружается...</p>
+                        <p style="text-align: center; padding: 40px; color: #a0a0b0;">График загружается...</p>
                     </div>
                 </div>
             </div>
@@ -1164,17 +1183,17 @@
                     
                     chartHtml += `
                         <div style="display: flex; align-items: center;">
-                            <div style="width: 100px; font-weight: 500;">${subject}</div>
-                            <div style="flex: 1; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                            <div style="width: 100px; font-weight: 500; color: #e6e6e6;">${subject}</div>
+                            <div style="flex: 1; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
                                 <div style="background: #4CAF50; width: ${width}%; height: 20px;"></div>
                             </div>
-                            <div style="width: 50px; text-align: right; margin-left: 10px;">${count}</div>
+                            <div style="width: 50px; text-align: right; margin-left: 10px; color: #e6e6e6;">${count}</div>
                         </div>
                     `;
                 }
                 
                 chartHtml += '</div>';
-                document.getElementById('subjects-chart').innerHTML = totalDays > 0 ? chartHtml : '<p style="text-align: center;">Нет данных для отображения</p>';
+                document.getElementById('subjects-chart').innerHTML = totalDays > 0 ? chartHtml : '<p style="text-align: center; color: #a0a0b0;">Нет данных для отображения</p>';
             }
 
             // === Архив ===
