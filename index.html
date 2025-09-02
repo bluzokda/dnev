@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Дневник - Все записи сохраняются</title>
+    <title>Мой Дневник - Улучшенные уведомления</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -30,6 +30,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            position: relative;
         }
         
         header {
@@ -379,6 +380,68 @@
             font-size: 0.8rem;
         }
         
+        /* Стили для уведомлений */
+        .notification-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .notification {
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 350px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .notification.warning {
+            background: #ff9800;
+        }
+        
+        .notification.info {
+            background: #2196F3;
+        }
+        
+        .notification-icon {
+            font-size: 1.2rem;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
         @media (max-width: 900px) {
             .main-content {
                 flex-direction: column;
@@ -403,11 +466,22 @@
             .filter-group {
                 width: 100%;
             }
+            
+            .notification {
+                max-width: 300px;
+                right: 10px;
+                bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Контейнер для уведомлений -->
+        <div class="notification-container" id="notification-container">
+            <!-- Уведомления будут добавляться сюда -->
+        </div>
+        
         <header>
             <div class="logo">
                 <i class="fas fa-book"></i>
@@ -494,7 +568,10 @@
                     <div class="actions">
                         <button class="btn btn-primary" id="save-btn">
                             <i class="fas fa-save"></i> Сохранить
-                        </button>                    
+                        </button>
+                        <button class="btn btn-warning" id="load-btn">
+                            <i class="fas fa-sync"></i> Загрузить
+                        </button>
                         <button class="btn btn-secondary" id="reset-btn">
                             <i class="fas fa-trash"></i> Очистить
                         </button>
@@ -692,12 +769,13 @@
             document.getElementById('save-btn').addEventListener('click', function() {
                 saveRecord();
                 updateStats();
-                alert('✅ Запись сохранена!');
+                showNotification('Запись успешно сохранена!', 'success');
             });
 
             document.getElementById('reset-btn').addEventListener('click', function() {
                 if (confirm('Очистить форму?')) {
                     clearForm();
+                    showNotification('Форма очищена', 'info');
                 }
             });
             
@@ -715,6 +793,7 @@
                 document.getElementById('sort-by').value = 'date-desc';
                 currentPage = 1;
                 loadArchive();
+                showNotification('Фильтры сброшены', 'info');
             });
             
             document.getElementById('filter-subject').addEventListener('change', function() {
@@ -763,7 +842,7 @@
                 const date = document.getElementById('date-selector').value;
                 
                 if (!subject) {
-                    alert('Пожалуйста, выберите предмет');
+                    showNotification('Пожалуйста, выберите предмет', 'error');
                     return;
                 }
                 
@@ -1083,6 +1162,53 @@
                 }
             }
 
+            // Функция для показа уведомлений
+            function showNotification(message, type = 'info') {
+                const notificationContainer = document.getElementById('notification-container');
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                
+                // Иконка в зависимости от типа уведомления
+                let icon = 'info-circle';
+                if (type === 'success') icon = 'check-circle';
+                if (type === 'error') icon = 'exclamation-circle';
+                if (type === 'warning') icon = 'exclamation-triangle';
+                
+                notification.innerHTML = `
+                    <i class="fas fa-${icon} notification-icon"></i>
+                    <div class="notification-content">${message}</div>
+                    <button class="notification-close"><i class="fas fa-times"></i></button>
+                `;
+                
+                notificationContainer.appendChild(notification);
+                
+                // Показываем уведомление с небольшой задержкой
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 10);
+                
+                // Закрытие уведомления по кнопке
+                notification.querySelector('.notification-close').addEventListener('click', () => {
+                    closeNotification(notification);
+                });
+                
+                // Автоматическое закрытие через 5 секунд
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        closeNotification(notification);
+                    }
+                }, 5000);
+            }
+            
+            function closeNotification(notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }
+
             // Удаление записи
             window.deleteRecord = function(id) {
                 if (confirm('Удалить эту запись?')) {
@@ -1097,7 +1223,7 @@
                         loadStats();
                     }
                     
-                    alert('Запись удалена!');
+                    showNotification('Запись удалена!', 'info');
                 }
             };
             
