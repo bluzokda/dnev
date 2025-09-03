@@ -693,6 +693,8 @@
         
         .notification-icon {
             font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
         }
         
         .notification-content {
@@ -1506,34 +1508,14 @@
             
             // Новая функция для отображения средней оценки по предметам
             function renderSubjectAverages(subjects) {
-                // Создаем контейнер для таблицы, если его еще нет
-                let tableContainer = document.getElementById('subject-averages-table');
+                const container = document.getElementById('subject-averages-table');
+                container.innerHTML = '';
                 
-                if (!tableContainer) {
-                    tableContainer = document.createElement('div');
-                    tableContainer.id = 'subject-averages-table';
-                    tableContainer.style.marginTop = '30px';
-                    
-                    const heading = document.createElement('h4');
-                    heading.style.color = '#a0c3ff';
-                    heading.style.marginBottom = '15px';
-                    heading.innerHTML = '<i class="fas fa-star"></i> Средние оценки по предметам';
-                    
-                    tableContainer.appendChild(heading);
-                    
-                    const table = document.createElement('table');
-                    table.className = 'avg-grades-table';
-                    table.id = 'avg-grades-table';
-                    tableContainer.appendChild(table);
-                    
-                    // Вставляем таблицу после графика
-                    document.getElementById('subjects-chart').parentNode.insertBefore(tableContainer, document.getElementById('subjects-chart').nextSibling);
-                }
+                // Создаем таблицу
+                const table = document.createElement('table');
+                table.className = 'avg-grades-table';
                 
-                const table = document.getElementById('avg-grades-table');
-                table.innerHTML = '';
-                
-                // Создаем заголовок таблицы
+                // Заголовок таблицы
                 const thead = document.createElement('thead');
                 thead.innerHTML = `
                     <tr>
@@ -1544,46 +1526,44 @@
                 `;
                 table.appendChild(thead);
                 
-                // Создаем тело таблицы
                 const tbody = document.createElement('tbody');
                 
-                // Сортируем предметы по средней оценке (по убыванию)
-                const sortedSubjects = Object.entries(subjects).sort((a, b) => {
-                    const avgA = a[1].gradeCount > 0 ? a[1].grades / a[1].gradeCount : 0;
-                    const avgB = b[1].gradeCount > 0 ? b[1].grades / b[1].gradeCount : 0;
-                    return avgB - avgA;
-                });
+                // Преобразуем объект в массив и фильтруем предметы без оценок
+                const subjectsWithGrades = Object.entries(subjects)
+                    .filter(([_, data]) => data.gradeCount > 0)
+                    .map(([subject, data]) => {
+                        const avg = (data.grades / data.gradeCount).toFixed(1);
+                        return { subject, ...data, avg };
+                    });
                 
-                // Заполняем таблицу данными
-                sortedSubjects.forEach(([subject, data]) => {
-                    // Пропускаем предметы без оценок
-                    if (data.gradeCount === 0) return;
-                    
+                // Сортируем по убыванию средней оценки
+                subjectsWithGrades.sort((a, b) => b.avg - a.avg);
+                
+                // Заполняем таблицу
+                subjectsWithGrades.forEach(item => {
                     const row = document.createElement('tr');
                     
-                    const avg = (data.grades / data.gradeCount).toFixed(1);
+                    // Определяем класс в зависимости от средней оценки
                     let avgClass = '';
-                    if (avg >= 4.5) avgClass = 'high';
-                    else if (avg >= 3.5) avgClass = 'medium';
+                    const avgNum = parseFloat(item.avg);
+                    if (avgNum >= 4.5) avgClass = 'high';
+                    else if (avgNum >= 3.5) avgClass = 'medium';
                     else avgClass = 'low';
                     
                     row.innerHTML = `
-                        <td class="subject-name">${subject}</td>
-                        <td>${data.gradeCount}</td>
-                        <td class="subject-avg ${avgClass}">${avg}</td>
+                        <td class="subject-name">${item.subject}</td>
+                        <td>${item.gradeCount}</td>
+                        <td class="subject-avg ${avgClass}">${item.avg}</td>
                     `;
-                    
                     tbody.appendChild(row);
                 });
                 
                 table.appendChild(tbody);
+                container.appendChild(table);
                 
                 // Если нет данных, показываем сообщение
-                if (tbody.children.length === 0) {
-                    table.innerHTML = '';
-                    const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="3" style="text-align: center; padding: 20px; color: #a0a0b0;">Нет данных для отображения</td>';
-                    table.appendChild(row);
+                if (subjectsWithGrades.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #a0a0b0;">Нет данных для отображения</p>';
                 }
             }
 
